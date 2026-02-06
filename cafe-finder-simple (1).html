@@ -1,0 +1,637 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>My Cafe Spots</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      background: linear-gradient(to bottom right, #fef3c7, #fed7aa, #fef08a);
+      min-height: 100vh;
+      padding: 20px;
+    }
+    .container { max-width: 1200px; margin: 0 auto; }
+    .header { text-align: center; margin-bottom: 30px; }
+    .header h1 { font-size: 48px; color: #1b0f78; margin-bottom: 10px; }
+    .header p { color: #240e92; font-size: 18px; font-style: italic; }
+    .btn {
+      padding: 15px 25px;
+      border: none;
+      border-radius: 15px;
+      font-weight: 600;
+      cursor: pointer;
+      font-size: 16px;
+    }
+    .btn-primary {
+      background: linear-gradient(to right, #d97706, #ea580c);
+      color: white;
+      box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1);
+    }
+    .btn-secondary {
+      background: white;
+      color: #240e92;
+      box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1);
+    }
+    .action-bar { display: flex; gap: 10px; margin-bottom: 20px; }
+    .action-bar .btn-primary { flex: 1; }
+    .card {
+      background: white;
+      border-radius: 20px;
+      padding: 30px;
+      margin-bottom: 20px;
+      border: 4px solid #fde68a;
+      box-shadow: 0 25px 50px -12px rgba(0,0,0,0.25);
+    }
+    .form-group { margin-bottom: 20px; }
+    .form-group label {
+      display: block;
+      font-weight: 600;
+      color: #240e92;
+      margin-bottom: 8px;
+      font-size: 14px;
+    }
+    .form-group input, .form-group textarea {
+      width: 100%;
+      padding: 12px 15px;
+      border: 2px solid #fcd34d;
+      border-radius: 10px;
+      font-size: 16px;
+    }
+    .form-group textarea { height: 100px; resize: vertical; }
+    .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+    .hidden { display: none; }
+    .cafe-list { display: grid; grid-template-columns: repeat(auto-fit, minmax(350px, 1fr)); gap: 20px; }
+    .cafe-card {
+      background: white;
+      border-radius: 20px;
+      padding: 20px;
+      border: 4px solid #fde68a;
+      box-shadow: 0 20px 25px -5px rgba(0,0,0,0.1);
+    }
+    .cafe-card h3 { color: #1b0f78; margin-bottom: 10px; font-size: 24px; }
+    .cafe-card .area { color: #240e92; font-weight: 600; margin-bottom: 5px; }
+    .cafe-card .address { color: #240e92; font-size: 14px; margin-bottom: 10px; }
+    .cafe-card .hours { color: #240e92; font-size: 14px; margin-bottom: 10px; }
+    .badge {
+      display: inline-block;
+      padding: 5px 12px;
+      border-radius: 20px;
+      font-size: 12px;
+      font-weight: 600;
+      margin-right: 5px;
+      margin-bottom: 5px;
+    }
+    .badge-coffee { background: #fef3c7; color: #92400e; }
+    .badge-space { background: #dbeafe; color: #1e40af; }
+    .badge-quiet { background: #e9d5ff; color: #6b21a8; }
+    .badge-wifi { background: #dcfce7; color: #15803d; }
+    .badge-outdoor { background: #ccfbf1; color: #115e59; }
+    .badge-open { background: #dcfce7; color: #15803d; }
+    .badge-closed { background: #fee2e2; color: #991b1b; }
+    .delete-btn {
+      background: #ef4444;
+      color: white;
+      border: none;
+      padding: 8px 15px;
+      border-radius: 8px;
+      cursor: pointer;
+      margin-top: 10px;
+    }
+    .edit-btn {
+      background: #3b82f6;
+      color: white;
+      border: none;
+      padding: 8px 15px;
+      border-radius: 8px;
+      cursor: pointer;
+      margin-top: 10px;
+    }
+    .stars { color: #f59e0b; margin: 10px 0; }
+    .filter-section { margin-bottom: 20px; }
+    .filter-buttons {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 10px;
+      margin-top: 15px;
+    }
+    .filter-btn {
+      padding: 12px;
+      border: none;
+      border-radius: 10px;
+      font-weight: 600;
+      cursor: pointer;
+      background: #fef3c7;
+      color: #240e92;
+    }
+    .filter-btn.active {
+      background: #d97706;
+      color: white;
+      box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1);
+    }
+    .attr-buttons {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+      gap: 10px;
+    }
+    .attr-btn {
+      padding: 12px;
+      border: none;
+      border-radius: 10px;
+      font-weight: 600;
+      cursor: pointer;
+      background: #fef3c7;
+      color: #240e92;
+      font-size: 14px;
+    }
+    .attr-btn.active {
+      background: #d97706;
+      color: white;
+      box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1);
+    }
+    .day-buttons {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+    .day-btn {
+      padding: 8px 15px;
+      border: none;
+      border-radius: 20px;
+      font-weight: 600;
+      cursor: pointer;
+      background: #fef3c7;
+      color: #240e92;
+    }
+    .day-btn.active {
+      background: #ef4444;
+      color: white;
+    }
+    .rating-stars {
+      display: flex;
+      gap: 5px;
+      margin: 10px 0;
+    }
+    .star {
+      font-size: 30px;
+      cursor: pointer;
+      color: #fcd34d;
+    }
+    .star.filled {
+      color: #f59e0b;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <h1>☕ My Cafe Spots</h1>
+      <p>Curtis' personal list of go-to cafes for work</p>
+    </div>
+
+    <div class="action-bar">
+      <button class="btn btn-primary" onclick="toggleAddForm()">➕ Add New Cafe</button>
+      <button class="btn btn-secondary" onclick="toggleFilters()">🔍 Filters</button>
+    </div>
+
+    <!-- Add Cafe Form -->
+    <div id="addForm" class="card hidden">
+      <h2 id="formTitle" style="margin-bottom: 20px; color: #78350f;">Add a New Cafe</h2>
+      
+      <div class="form-grid">
+        <div class="form-group">
+          <label>Cafe Name *</label>
+          <input type="text" id="cafeName" placeholder="Blue Bottle Coffee">
+        </div>
+        <div class="form-group">
+          <label>Area / Neighborhood *</label>
+          <input type="text" id="cafeArea" placeholder="Downtown, Mission">
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label>Google Maps Search (optional - to link to the place)</label>
+        <input type="text" id="cafeGoogleSearch" placeholder="e.g., 'Blue Bottle Coffee Mission San Francisco'">
+        <small style="color: #d97706; display: block; margin-top: 5px;">💡 Tip: Enter the full name + area to help you find it on Google Maps later</small>
+      </div>
+
+      <div class="form-group">
+        <label>Address</label>
+        <input type="text" id="cafeAddress" placeholder="123 Main St">
+      </div>
+
+      <div class="form-grid">
+        <div class="form-group">
+          <label>Opens At</label>
+          <input type="time" id="cafeOpen" value="08:00">
+        </div>
+        <div class="form-group">
+          <label>Closes At</label>
+          <input type="time" id="cafeClose" value="18:00">
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label>Closed On</label>
+        <div class="day-buttons" id="closedDays"></div>
+      </div>
+
+      <div class="form-group">
+        <label>What's Great About It?</label>
+        <div class="attr-buttons" id="attributes"></div>
+      </div>
+
+      <div class="form-group">
+        <label>Your Rating</label>
+        <div class="rating-stars" id="ratingStars"></div>
+      </div>
+
+      <div class="form-group">
+        <label>Notes</label>
+        <textarea id="cafeNotes" placeholder="Any details to remember..."></textarea>
+      </div>
+
+      <div style="display: flex; gap: 10px;">
+        <button class="btn btn-primary" onclick="saveCafe()">Save Cafe</button>
+        <button class="btn btn-secondary" onclick="toggleAddForm()">Cancel</button>
+      </div>
+    </div>
+
+    <!-- Filters -->
+    <div id="filtersPanel" class="card hidden">
+      <h2 style="margin-bottom: 20px; color: #78350f;">What Are You Looking For?</h2>
+      
+      <div class="form-group">
+        <label>Area / Neighborhood</label>
+        <input type="text" id="filterArea" placeholder="Type area name..." oninput="applyFilters()">
+      </div>
+
+      <div class="filter-buttons" id="filterButtons"></div>
+    </div>
+
+    <!-- Results -->
+    <div style="text-align: center; margin: 20px 0;">
+      <p id="resultsCount" style="color: #240e92; font-size: 18px; font-weight: 600;"></p>
+    </div>
+
+    <!-- Cafe List -->
+    <div class="cafe-list" id="cafeList"></div>
+  </div>
+
+  <script>
+    let cafes = [];
+    let filters = {
+      area: '',
+      goodCoffee: false,
+      bigSpace: false,
+      quietForCalls: false,
+      fastWifi: false,
+      outdoorSeating: false,
+      openNow: false
+    };
+    let currentRating = 3;
+    let selectedClosedDays = [];
+    let selectedAttributes = {
+      goodCoffee: false,
+      bigSpace: false,
+      quietForCalls: false,
+      fastWifi: false,
+      outdoorSeating: false,
+      goodForMeetings: false,
+      hasOutlets: true,
+      naturalLight: false
+    };
+    let editingCafeId = null;
+
+    // Initialize
+    window.onload = function() {
+      loadCafes();
+      initDayButtons();
+      initAttributeButtons();
+      initRatingStars();
+      initFilterButtons();
+      renderCafes();
+    };
+
+    function loadCafes() {
+      const stored = localStorage.getItem('my-cafes');
+      if (stored) {
+        cafes = JSON.parse(stored);
+      }
+    }
+
+    function saveCafes() {
+      localStorage.setItem('my-cafes', JSON.stringify(cafes));
+    }
+
+    function toggleAddForm() {
+      const form = document.getElementById('addForm');
+      form.classList.toggle('hidden');
+      if (!form.classList.contains('hidden')) {
+        resetForm();
+        editingCafeId = null;
+        document.getElementById('formTitle').textContent = 'Add a New Cafe';
+      }
+    }
+
+    function toggleFilters() {
+      document.getElementById('filtersPanel').classList.toggle('hidden');
+    }
+
+    function resetForm() {
+      document.getElementById('cafeName').value = '';
+      document.getElementById('cafeArea').value = '';
+      document.getElementById('cafeAddress').value = '';
+      document.getElementById('cafeGoogleSearch').value = '';
+      document.getElementById('cafeOpen').value = '08:00';
+      document.getElementById('cafeClose').value = '18:00';
+      document.getElementById('cafeNotes').value = '';
+      currentRating = 3;
+      selectedClosedDays = [];
+      selectedAttributes = {
+        goodCoffee: false,
+        bigSpace: false,
+        quietForCalls: false,
+        fastWifi: false,
+        outdoorSeating: false,
+        goodForMeetings: false,
+        hasOutlets: true,
+        naturalLight: false
+      };
+      initDayButtons();
+      initAttributeButtons();
+      initRatingStars();
+    }
+
+    function initDayButtons() {
+      const days = ['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday'];
+      const container = document.getElementById('closedDays');
+      container.innerHTML = days.map(day => 
+        `<button class="day-btn ${selectedClosedDays.includes(day) ? 'active' : ''}" onclick="toggleDay('${day}')">
+          ${day.charAt(0).toUpperCase() + day.slice(1, 3)}
+        </button>`
+      ).join('');
+    }
+
+    function toggleDay(day) {
+      if (selectedClosedDays.includes(day)) {
+        selectedClosedDays = selectedClosedDays.filter(d => d !== day);
+      } else {
+        selectedClosedDays.push(day);
+      }
+      initDayButtons();
+    }
+
+    function initAttributeButtons() {
+      const attrs = [
+        { key: 'goodCoffee', label: 'Great Coffee' },
+        { key: 'bigSpace', label: 'Spacious' },
+        { key: 'quietForCalls', label: 'Quiet for Calls' },
+        { key: 'fastWifi', label: 'Fast WiFi' },
+        { key: 'outdoorSeating', label: 'Outdoor Seats' },
+        { key: 'goodForMeetings', label: 'Good for Meetings' },
+        { key: 'hasOutlets', label: 'Power Outlets' },
+        { key: 'naturalLight', label: 'Natural Light' }
+      ];
+      const container = document.getElementById('attributes');
+      container.innerHTML = '';
+      attrs.forEach(attr => {
+        const btn = document.createElement('button');
+        btn.className = 'attr-btn' + (selectedAttributes[attr.key] ? ' active' : '');
+        btn.textContent = attr.label;
+        btn.onclick = function() { toggleAttribute(attr.key); };
+        container.appendChild(btn);
+      });
+    }
+
+    function toggleAttribute(key) {
+      selectedAttributes[key] = !selectedAttributes[key];
+      initAttributeButtons();
+    }
+
+    function initRatingStars() {
+      const container = document.getElementById('ratingStars');
+      container.innerHTML = [1, 2, 3, 4, 5].map(i =>
+        `<span class="star ${i <= currentRating ? 'filled' : ''}" onclick="setRating(${i})">★</span>`
+      ).join('');
+    }
+
+    function setRating(rating) {
+      currentRating = rating;
+      initRatingStars();
+    }
+
+    function initFilterButtons() {
+      const filterDefs = [
+        { key: 'openNow', label: 'Open Now' },
+        { key: 'goodCoffee', label: 'Great Coffee' },
+        { key: 'bigSpace', label: 'Spacious' },
+        { key: 'quietForCalls', label: 'Quiet for Calls' },
+        { key: 'fastWifi', label: 'Fast WiFi' },
+        { key: 'outdoorSeating', label: 'Outdoor Seating' }
+      ];
+      const container = document.getElementById('filterButtons');
+      container.innerHTML = filterDefs.map(f =>
+        `<button class="filter-btn ${filters[f.key] ? 'active' : ''}" onclick="toggleFilter('${f.key}')">
+          ${f.label}
+        </button>`
+      ).join('');
+    }
+
+    function toggleFilter(key) {
+      filters[key] = !filters[key];
+      initFilterButtons();
+      applyFilters();
+    }
+
+    function applyFilters() {
+      filters.area = document.getElementById('filterArea').value;
+      renderCafes();
+    }
+
+    function saveCafe() {
+      const name = document.getElementById('cafeName').value.trim();
+      const area = document.getElementById('cafeArea').value.trim();
+      
+      if (!name || !area) {
+        alert('Please enter cafe name and area');
+        return;
+      }
+
+      const googleSearch = document.getElementById('cafeGoogleSearch').value.trim();
+
+      const cafeData = {
+        name: name,
+        area: area,
+        address: document.getElementById('cafeAddress').value,
+        googleSearch: googleSearch || (name + ' ' + area),
+        hours: {
+          open: document.getElementById('cafeOpen').value,
+          close: document.getElementById('cafeClose').value
+        },
+        closedDays: selectedClosedDays,
+        attributes: selectedAttributes,
+        personalRating: currentRating,
+        notes: document.getElementById('cafeNotes').value
+      };
+
+      if (editingCafeId) {
+        // Update existing cafe
+        const index = cafes.findIndex(c => c.id === editingCafeId);
+        if (index !== -1) {
+          cafes[index] = {
+            ...cafes[index],
+            ...cafeData
+          };
+        }
+        editingCafeId = null;
+      } else {
+        // Create new cafe
+        const cafe = {
+          ...cafeData,
+          id: Date.now().toString(),
+          createdAt: new Date().toISOString()
+        };
+        cafes.push(cafe);
+      }
+
+      saveCafes();
+      toggleAddForm();
+      renderCafes();
+    }
+
+    function deleteCafe(id) {
+      if (confirm('Delete this cafe?')) {
+        cafes = cafes.filter(c => c.id !== id);
+        saveCafes();
+        renderCafes();
+      }
+    }
+
+    function editCafe(id) {
+      const cafe = cafes.find(c => c.id === id);
+      if (!cafe) return;
+
+      editingCafeId = id;
+      
+      // Populate form with cafe data
+      document.getElementById('cafeName').value = cafe.name;
+      document.getElementById('cafeArea').value = cafe.area;
+      document.getElementById('cafeAddress').value = cafe.address || '';
+      document.getElementById('cafeGoogleSearch').value = cafe.googleSearch || '';
+      document.getElementById('cafeOpen').value = cafe.hours.open;
+      document.getElementById('cafeClose').value = cafe.hours.close;
+      document.getElementById('cafeNotes').value = cafe.notes || '';
+      
+      currentRating = cafe.personalRating;
+      selectedClosedDays = [...cafe.closedDays];
+      selectedAttributes = {...cafe.attributes};
+      
+      // Update UI
+      initDayButtons();
+      initAttributeButtons();
+      initRatingStars();
+      
+      // Show form with edit title
+      document.getElementById('formTitle').textContent = 'Edit Cafe';
+      document.getElementById('addForm').classList.remove('hidden');
+      
+      // Scroll to form
+      document.getElementById('addForm').scrollIntoView({ behavior: 'smooth' });
+    }
+
+    function isOpenNow(cafe) {
+      const now = new Date();
+      const dayOfWeek = now.getDay();
+      const dayNames = ['sunday', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday'];
+      const currentDay = dayNames[dayOfWeek];
+      
+      if (cafe.closedDays.includes(currentDay)) return false;
+      
+      const currentTime = now.getHours() * 60 + now.getMinutes();
+      const [openHour, openMin] = cafe.hours.open.split(':').map(Number);
+      const [closeHour, closeMin] = cafe.hours.close.split(':').map(Number);
+      const openTime = openHour * 60 + openMin;
+      const closeTime = closeHour * 60 + closeMin;
+      
+      return currentTime >= openTime && currentTime <= closeTime;
+    }
+
+    function renderCafes() {
+      let filtered = cafes.filter(cafe => {
+        if (filters.area && !cafe.area.toLowerCase().includes(filters.area.toLowerCase())) return false;
+        if (filters.goodCoffee && !cafe.attributes.goodCoffee) return false;
+        if (filters.bigSpace && !cafe.attributes.bigSpace) return false;
+        if (filters.quietForCalls && !cafe.attributes.quietForCalls) return false;
+        if (filters.fastWifi && !cafe.attributes.fastWifi) return false;
+        if (filters.outdoorSeating && !cafe.attributes.outdoorSeating) return false;
+        if (filters.openNow && !isOpenNow(cafe)) return false;
+        return true;
+      }).sort((a, b) => b.personalRating - a.personalRating);
+
+      const activeFilters = Object.values(filters).filter(v => v === true).length + (filters.area ? 1 : 0);
+      document.getElementById('resultsCount').textContent = 
+        activeFilters > 0 
+          ? `Found ${filtered.length} cafe${filtered.length !== 1 ? 's' : ''} matching your needs`
+          : `Showing all ${cafes.length} cafe${cafes.length !== 1 ? 's' : ''}`;
+
+      const container = document.getElementById('cafeList');
+      
+      if (filtered.length === 0) {
+        container.innerHTML = `
+          <div class="card" style="text-align: center; grid-column: 1 / -1;">
+            <h2 style="color: #fcd34d; margin-bottom: 15px;">☕</h2>
+            <p style="color: #240e92; font-size: 18px;">
+              ${cafes.length === 0 ? 'No cafes saved yet. Add your first one above!' : 'No cafes match your criteria.'}
+            </p>
+          </div>
+        `;
+        return;
+      }
+
+      container.innerHTML = filtered.map(cafe => {
+        const openNow = isOpenNow(cafe);
+        const stars = '★'.repeat(cafe.personalRating) + '☆'.repeat(5 - cafe.personalRating);
+        const googleMapsUrl = 'https://www.google.com/maps/search/?api=1&query=' + encodeURIComponent(cafe.googleSearch || (cafe.name + ' ' + cafe.area));
+        
+        let badges = '';
+        if (cafe.attributes.goodCoffee) badges += '<span class="badge badge-coffee">☕ Great Coffee</span>';
+        if (cafe.attributes.bigSpace) badges += '<span class="badge badge-space">👥 Spacious</span>';
+        if (cafe.attributes.quietForCalls) badges += '<span class="badge badge-quiet">🤫 Quiet</span>';
+        if (cafe.attributes.fastWifi) badges += '<span class="badge badge-wifi">📶 Fast WiFi</span>';
+        if (cafe.attributes.outdoorSeating) badges += '<span class="badge badge-outdoor">🌳 Outdoor</span>';
+        if (cafe.attributes.goodForMeetings) badges += '<span class="badge badge-coffee">🤝 Meetings</span>';
+        if (cafe.attributes.hasOutlets) badges += '<span class="badge badge-wifi">🔌 Outlets</span>';
+        if (cafe.attributes.naturalLight) badges += '<span class="badge badge-outdoor">☀️ Natural Light</span>';
+
+        return `
+          <div class="cafe-card">
+            <h3>${cafe.name}</h3>
+            <div class="area">📍 ${cafe.area}</div>
+            ${cafe.address ? `<div class="address">${cafe.address}</div>` : ''}
+            <div class="stars">${stars}</div>
+            <div class="hours">
+              🕒 ${cafe.hours.open} - ${cafe.hours.close}
+              <span class="badge ${openNow ? 'badge-open' : 'badge-closed'}">
+                ${openNow ? 'Open Now' : 'Closed'}
+              </span>
+            </div>
+            <div style="margin: 10px 0;">${badges}</div>
+            ${cafe.notes ? `<div style="background: #fffbeb; padding: 10px; border-radius: 8px; margin-top: 10px; font-size: 14px; font-style: italic; color: #240e92;">${cafe.notes}</div>` : ''}
+            <div style="margin-top: 10px; display: flex; gap: 8px;">
+              <a href="${googleMapsUrl}" target="_blank" style="flex: 1; text-decoration: none;">
+                <button class="btn btn-primary" style="width: 100%; padding: 10px;">
+                  🗺️ Open in Google Maps
+                </button>
+              </a>
+              <button class="edit-btn" onclick="editCafe('${cafe.id}')" style="margin: 0;">✏️</button>
+              <button class="delete-btn" onclick="deleteCafe('${cafe.id}')" style="margin: 0;">🗑️</button>
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+  </script>
+</body>
+</html>
